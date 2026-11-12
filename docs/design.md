@@ -257,8 +257,13 @@ GET      /api/ws                # 控制台复用同一 WS 事件总线（只读
 | M4 投递 | 投递状态机 + 过滤策略 + 招呼语模板 + 护栏全量生效 | 串行投递 10 个职位全程无人工干预（验证码除外），日志完整 |
 | M5 打磨 | 异常告警、统计、首次使用引导、免责声明、打包（单二进制 + 插件 zip） | 端到端演练 + 文档齐全 |
 
-## 9. 待决事项
+## 9. 已决事项与实现约定
 
-1. 项目名 `job-chat-copilot` 是否符合预期，或另取（决定后 `git init`，仓库放 `~/Workspace/github/linuxsuren/<name>`）
-2. 招呼语是否支持多模板轮换（M4 内做还是后置）
-3. LLM 供应商默认预设放哪些（建议 DeepSeek / GLM / Qwen 三预设 + 自定义）
+- 项目名：`job-chat-copilot`，仓库 `github.com/linuxsuren/job-chat-copilot`
+- 招呼语支持多模板轮换（顺序/随机两种策略，M4 实现）
+- LLM 预设：DeepSeek / GLM / Qwen 三预设 + 自定义（base_url/api_key/model 可全覆盖）
+- Go module：`github.com/linuxsuren/job-chat-copilot`；服务默认监听 `127.0.0.1:7422`
+- 顶层目录：`server/`（Go）、`extension/`（MV3 插件，TypeScript + Vite）、`web/`（Vue 3 控制台，JS + Vite + Element Plus）
+- 验证命令：`cd server && go build ./... && go test ./...`；`cd web && npm ci && npm run build`；`cd extension && npm ci && npm run build`
+- SQLite 驱动：`modernc.org/sqlite`（纯 Go，免 CGO）；浏览器托管：`github.com/go-rod/rod`
+- 三端契约唯一事实源：本文档 §5（WS 事件 + REST），字段一律 snake_case；实现中契约需要变更时，必须先改本文档再改代码
