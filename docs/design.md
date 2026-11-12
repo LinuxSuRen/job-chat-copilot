@@ -93,7 +93,7 @@ extension/
 
 - `host_permissions: ["https://www.zhipin.com/*"]`
 - `permissions: ["storage"]`（最小集，不要 tabs/cookies 等敏感权限）
-- content-scripts 匹配 `https://www.zhipin.com/*`，`run_at: document_idle`
+- content-scripts 匹配 `https://www.zhipin.com/*`：DOM 执行器 `run_at: document_idle`；MAIN_WORLD 注入脚本 `world: MAIN` + `run_at: document_start`（否则 hook 不到页面已建立的 WebSocket），需 Chrome 111+（manifest 标 minimum_chrome_version）
 - CSP 默认，不引入远程代码
 
 ### 3.3 DOM 操作原则
@@ -174,7 +174,7 @@ WS 拦截到新消息 → 落库 → 规则库匹配（到岗时间/薪资/地�
 settings(k,v)                    -- LLM 配置、护栏参数、话术模板
 resume_context(id, content, ...) -- 简历结构化上下文（可多版本）
 rule(id, pattern, answer, ...)   -- 高频问题规则库
-job(id, job_key UNIQUE, title, company, salary, status, delivered_at, ...)
+job(id, job_key UNIQUE, title, company, salary, jd_text, status, delivered_at, ...)
 conversation(id, conv_key UNIQUE, hr_name, job_id, last_msg_at, ...)
 message(id, conv_id, direction, content, msg_type, raw_hint, sent_at)
 draft(id, conv_id, source ENUM(rule,llm,human), content, status
@@ -195,17 +195,21 @@ audit_event(id, type, detail, created_at)  -- 验证码/暂停等关键事件
 
 | event | 载荷 | 说明 |
 |---|---|---|
-| `deliver.next` | 职位参数 | 执行一次"立即沟通"+招呼语 |
+| `hello_ack` | paired, bind_token | 配对成功回执，下发绑定 token（插件持久化，之后凭 token 鉴权） |
+| `deliver.next` | job_key, job_title, greeting | 执行一次"立即沟通"+招呼语（job_key 为服务端从 jobs.list 过滤后指定的具体职位） |
+| `jobs.scan` | keyword | 触发插件扫描当前搜索页职位卡片并上报 `jobs.list` |
 | `chat.send` | conv_key, content | 发送已审核的回复 |
 | `chat.poll` | – | 触发一次 DOM 会话列表兜底扫描 |
 | `guard.pause` | reason_code | 立即暂停所有操作 |
-| `config.sync` | 抖动参数等 | 下发人化间隔配置 |
+| `config.sync` | 抖动参数, paused:boolean | 下发人化间隔配置；paused:false 即恢复执行 |
+| `review.stats` | pending_count | 待审草稿计数（供插件 popup 展示） |
 
 插件→服务：
 
 | event | 载荷 | 说明 |
 |---|---|---|
 | `hello` | token, ext_version | 握手与鉴权 |
+| `jobs.list` | keyword, jobs: [{job_key, title, company, salary, jd_text}] | 搜索页职位卡片扫描结果；服务端落库 + 按 exclude_keywords/薪资过滤 + 排程，再逐个下发 deliver.next（招呼语模板轮换与 JD 变量替换在服务端完成后随 greeting 下发） |
 | `chat.message` | conv_key, direction, content, msg_type, ts | 新消息（拦截法） |
 | `chat.snapshot` | 会话列表快照 | 兜底扫描结果 |
 | `deliver.result` | job_key, ok, fail_code | 投递动作结果 |
@@ -224,8 +228,12 @@ GET      /api/drafts?status=pending&page=&page_size=
 PUT      /api/drafts/{id}       # 审核：approve(可改内容)/reject
 POST     /api/tasks/deliver     { keyword, filters, daily_limit }
 POST     /api/tasks/:action     # pause / resume
+GET      /api/pairing           # { paired, pairing_code }
+GET      /api/stats             # 今日投递/回复计数、护栏状态、插件连接状态
 GET      /api/ws                # 控制台复用同一 WS 事件总线（只读事件 + 草稿提醒）
 ```
+
+控制台 WS 事件（复用 §5.1 事件名，另加）：`draft.ready {draft_id, conv_id}`、`plugin.connected`、`plugin.disconnected`。
 
 ## 6. Vue 控制台（Vite + Vue 3）
 

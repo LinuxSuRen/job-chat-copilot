@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>job-chat-copilot</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body {
+        font-family: system-ui, -apple-system, "PingFang SC", sans-serif;
+        width: 260px; margin: 0; padding: 12px; font-size: 13px;
+      }
+      h1 { font-size: 14px; margin: 0 0 10px; }
+      .row { display: flex; justify-content: space-between; padding: 5px 0; }
+      .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; }
+      .dot.ok { background: #38a169; }
+      .dot.bad { background: #e53e3e; }
+      .dot.wait { background: #dd6b20; }
+      .muted { color: rgba(128,128,128,0.9); font-size: 11px; margin-top: 8px; }
+      .paused {
+        margin-top: 8px; padding: 6px 8px; border-radius: 6px;
+        background: rgba(229, 62, 62, 0.15); color: #e53e3e;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>job-chat-copilot</h1>
+    <div class="row">
+      <span><span id="ws-dot" class="dot bad"></span>服务连接</span>
+      <span id="ws-status">—</span>
+    </div>
+    <div class="row"><span>今日投递</span><span id="delivered">—</span></div>
+    <div class="row"><span>待审回复</span><span id="pending">—</span></div>
+    <div id="paused-box" class="paused" hidden>已暂停：<span id="paused-reason"></span></div>
+    <p class="muted">审核与配置请打开本地控制台；<a href="options.html" target="_blank">插件配对设置</a></p>
+
+    <script type="module" src="/src/popup/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "job-chat-copilot",
+  "version": "0.1.0",
+  "description": "Boss直聘半自动求职助手（配对本地 job-chat-copilot 服务）",
+  "minimum_chrome_version": "111",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "host_permissions": ["https://www.zhipin.com/*"],
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.zhipin.com/*"],
+      "js": ["inject.js"],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://www.zhipin.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "options_page": "options.html",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "job-chat-copilot"
+  }
+}

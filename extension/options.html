@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>job-chat-copilot 配对</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body {
+        font-family: system-ui, -apple-system, "PingFang SC", sans-serif;
+        max-width: 520px;
+        margin: 40px auto;
+        padding: 0 16px;
+      }
+      h1 { font-size: 20px; }
+      section {
+        border: 1px solid rgba(128, 128, 128, 0.35);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      label { display: block; font-size: 13px; margin: 12px 0 4px; color: rgba(128,128,128,0.9); }
+      input {
+        width: 100%; box-sizing: border-box; padding: 8px;
+        border: 1px solid rgba(128,128,128,0.5); border-radius: 6px; font-size: 14px;
+      }
+      button {
+        margin-top: 12px; padding: 8px 18px; border: 0; border-radius: 6px;
+        background: #2b6cb0; color: #fff; font-size: 14px; cursor: pointer;
+      }
+      .status { font-size: 14px; line-height: 1.8; }
+      .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+      .dot.ok { background: #38a169; }
+      .dot.bad { background: #e53e3e; }
+      .dot.wait { background: #dd6b20; }
+      .muted { color: rgba(128,128,128,0.9); font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>job-chat-copilot 插件配对</h1>
+
+    <section class="status">
+      <div><span id="ws-dot" class="dot bad"></span>服务连接：<span id="ws-status">未连接</span></div>
+      <div>绑定状态：<span id="pair-status">未绑定</span></div>
+      <div>页面操作：<span id="pause-status">正常</span></div>
+    </section>
+
+    <section>
+      <label for="server-url">本地服务地址（WebSocket）</label>
+      <input id="server-url" placeholder="ws://127.0.0.1:7422/ws/ext" />
+      <label for="pairing-code">配对码（控制台「概览」页展示的一次性配对码，仅在未绑定时需要）</label>
+      <input id="pairing-code" placeholder="例如：4F7A-92KX" />
+      <button id="save">保存并连接</button>
+      <p class="muted">配对成功后插件保存绑定 token，后续自动鉴权；配对码仅首次使用。</p>
+    </section>
+
+    <script type="module" src="/src/options/main.ts"></script>
+  </body>
+</html>

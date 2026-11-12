@@ -1,0 +1,18 @@
+{
+  "name": "job-chat-copilot-extension",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "tsc --noEmit && vite build && BUILD_TARGET=background vite build --mode background && BUILD_TARGET=content vite build --mode content && BUILD_TARGET=inject vite build --mode inject",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.287",
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8"
+  }
+}

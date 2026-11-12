@@ -1,0 +1,9 @@
+node_modules/
+/web/dist/
+/extension/dist/
+server/bin/
+server/data/
+server/internal/webui/dist/*
+!server/internal/webui/dist/index.placeholder.html
+*.log
+.DS_Store
